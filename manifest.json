@@ -1,0 +1,19 @@
+﻿{
+	"name": "felicious",
+	"version": "0.1.1",
+	"description": "Browse your f***ing delicious bookmarks",
+	"background_page": "background.html",
+	"options_page": "options.html",
+	"browser_action": {
+		"default_icon": "images/icon_20.png",
+		"popup": "popup.html"
+	},
+	"icons": {
+		"16": "images/icon_16.png",
+		"32": "images/icon_32.png",
+		"48": "images/icon_48.png"
+	},
+	"permissions": [
+		"https://api.del.icio.us/*", "tabs"
+	]
+}

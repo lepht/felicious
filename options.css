@@ -1,0 +1,99 @@
+﻿body{
+	font-family: Arial;
+	margin: 10px;
+	font-size: 12px;
+	min-width: 900px;
+}
+
+h1{
+	font-size: 21px;
+	margin: 0;
+	padding: 0;
+	height: 67px;
+	line-height: 67px;
+	background-image: url('images/icon_64.png');
+	background-repeat: no-repeat;
+	background-position: left center;
+	padding-left: 76px;
+}
+
+h2{
+	margin: 12px 0 6px 0;
+	padding: 3px;
+	border-top: 1px solid #9cc2ef;
+	background-color: #ebeff9;
+	font-size: 13px;
+	font-weight: bold;
+}
+ 
+#user label{
+	display: block;
+}
+
+h3{
+	margin-top: 0;
+}
+h4{
+	font-size: 12px;
+	font-weight: bold;
+	display: inline;
+	float: left;
+	margin: 0;
+	padding: 0 20px 0 0;
+}
+input[type=text],
+input[type=password]{
+	width: 100%;
+}
+#user,
+#synch{
+	width: 220px;
+	margin: 0 20px 20px 0;
+	height: 120px;
+	float: left;
+	border: 1px solid #cccccc;
+	border-radius: 5px;
+	padding: 12px;
+}
+
+.row{
+	height: 20px;
+	line-height: 20px;
+	vertical-align: center;
+}
+input[type=checkbox]{
+	display: block;
+	float: left;
+}
+legend{
+	font-weight: bold;
+}
+
+a.working{
+	background: url('images/spinner.gif') no-repeat right center;
+	padding-right: 20px;
+	color: #999999;
+	text-decoration: none;
+	cursor: default;
+}
+#syncherror{
+	-webkit-transition: opacity .5s ease-in-out, height 0s linear .5s;
+	opacity: 0;
+	height: 0;
+	overflow: hidden;
+	color: red;
+	padding: 0;
+	margin: 0;
+}
+a.error + #syncherror{
+	-webkit-transition: opacity .5s ease-in-out, height 0s;
+	height: 20px;
+	opacity: 1;
+}
+
+div.notes{
+	float: right;
+	width: 320px;
+	padding: 6px 20px 0 20px;
+	border-left: 1px solid #cccccc;
+}
