@@ -208,6 +208,7 @@ ul li.hidden{
 	margin: 0px;
 	opacity: 0;
 	overflow: hidden;
+	visibility: hidden;
 }
 
 ul.tags li a,
