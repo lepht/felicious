@@ -2,7 +2,7 @@
 Colors:
 	blue: #3274d0
 	green: #7cba0f
-	hover: #cccccc
+	hover: #eeeeee
 */
 
 body{
@@ -129,6 +129,12 @@ div.sort ul li a{
 div.sort ul li a:hover{
 	background-color: #eeeeee;
 }
+div.sort ul hr{
+	border: 0;
+	height: 1px;
+	background-color: #bbbbbb;
+	margin: 0;
+}
 
 /*__Sort Button__*/
 .heading a.sort{
@@ -238,25 +244,6 @@ ul.posts li a img{
 	float: left;
 }
 
-/*__Tag List__*/
-ul.tags li a .count{
-	color: #aaaaaa;
-	float: right;
-}
-ul.tags:empty:after{
-	content: 'no tags found';
-	border: 1px solid #dddddd;
-	color: #cccccc;
-	padding: 10px;
-	margin: 40px;
-	display: block;
-	text-align: center;
-	 -webkit-border-radius: 5px;
-}
-ul.tags li a.untagged{
-	color: #cccccc;
-}
-
 /*__Post List__*/
 ul.posts li .notes{
 	display: none;
@@ -280,6 +267,91 @@ ul.posts li:hover .edit{
 ul.posts li .edit:hover{
 	opacity: .8;
 	-webkit-transition: opacity .2s linear;
+}
+
+/*__Tag List__*/
+ul.tags li a .count{
+	color: #aaaaaa;
+	float: right;
+}
+ul.tags:empty:after{
+	content: 'no tags found';
+	border: 1px solid #dddddd;
+	color: #cccccc;
+	padding: 10px;
+	margin: 40px;
+	display: block;
+	text-align: center;
+	-webkit-border-radius: 5px;
+}
+ul.tags li a.untagged{
+	color: #cccccc;
+}
+
+/*__Tag Cloud__*/
+ul.tags.cloud{
+	text-align: justify;
+	padding: 0px 1px 0px 1px;
+}
+ul.tags.cloud li,
+ul.tags.cloud li a{
+	display: inline;
+	height: auto;
+	width: auto;
+	line-height: 20px;
+	padding: auto;
+	margin: auto;
+	white-space: normal;
+}
+ul.tags.cloud li{
+	-webkit-transition: none;
+}
+ul.tags.cloud li:hover a{
+	background-color: inherit;
+}
+ul.tags.cloud li.hidden{
+	display: none;
+}
+ul.tags.cloud li:after{
+	content: ' ';
+}
+ul.tags.cloud li.size_1 a{
+	font-size: 13px;
+	opacity: .3;
+}
+ul.tags.cloud li.size_2 a{
+	font-size: 13px;
+	opacity: .5;
+}
+ul.tags.cloud li.size_3 a{
+	opacity: .7;
+	font-size: 14px;
+}
+ul.tags.cloud li.size_4 a{
+	font-size: 14px;
+	opacity: 1;
+}
+ul.tags.cloud li.size_5 a{
+	font-size: 14px;
+	font-weight: bold;
+	opacity: 1;
+}
+ul.tags.cloud .count{
+	position: absolute;
+	display: none;
+}
+ul.tags.cloud li a:hover{
+	-webkit-border-radius: 3px;
+	-webkit-box-shadow: 0 0px 2px rgba(0, 0, 0, 1), inset 0 0 2px rgba(255, 255, 255, .8);
+	background-color: #000000;
+	/*color: rgba(255, 255, 255, .7);*/
+	color: #333333;
+	/*text-shadow: 0 -1px 0px rgba(255, 255, 255, .8);*/
+	background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #eeeeee), color-stop(1, #dddddd));
+	opacity: 1;
+}
+ul.tags.cloud li:hover a .count{
+	display: none;
 }
 
 /*__Notifications__*/

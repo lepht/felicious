@@ -8,9 +8,8 @@ var tagElementCache = {};
 
 document.addEvent('domready', function(){
 	//initialize
-	postList = new List('posts', {
+	postList = new PostList('posts', {
 		localStorageID: 'posts',
-		createElement: createPostListItem,
 		sortOrder: 'desc',
 		sorters: {
 			'name': sortPostByTitle,
@@ -18,11 +17,10 @@ document.addEvent('domready', function(){
 		},
 		currentSorter: 'date',
 		data: delicious.posts
-	});
+	}).update();
 	
-	tagList = new List('tags',{
+	tagList = new TagList('tags',{
 		localStorageID: 'tags',
-		createElement: createTagListItem,
 		sortOrder: 'desc',
 		sorters: {
 			'name': sortTagByName,
@@ -30,7 +28,7 @@ document.addEvent('domready', function(){
 		},
 		currentSorter: 'count',
 		data: delicious.tags
-	});
+	}).update();
 	
 	notifications = new Notifications('notifications');
 	
@@ -76,7 +74,6 @@ document.addEvent('domready', function(){
 		}
 	});
 	
-	
 	new SortMenu('post_sort', postList);
 	new SortMenu('tag_sort', tagList);
 	
@@ -95,9 +92,6 @@ document.addEvent('domready', function(){
 	}else{
 		delicious.update();
 	}
-	
-	postList.sort();
-	tagList.sort();
 });
 
 function bookmarkURL(url, title){
@@ -143,32 +137,53 @@ var SortMenu = new Class({
 	update: function(){
 		var element = this.element;
 		var list = this.list;
-	
-		var listElement = element.getElement('ul');
-		var sortButtonElement = element.getElement('a.sort');
+		var listElement = element.getElement('ul').empty();
+		var sortButtons = new Elements();
+		var viewButtons = new Elements();
+		var sortDirectionButton = element.getElement('a.sort').addClass(list.sortOrder);
 		
-		sortButtonElement.addClass(list.sortOrder);
-		
-		listElement.empty();
+		//create sorter buttons
 		$each(list.sorters, function(item, key){
 			var li = new Element('li').injectInside(listElement);
 			var anchor = new Element('a', {text: 'sort by ' + key, href: '#'}).injectInside(li);
 			anchor.addEventListener('click', function(){
-				list.sort(key);
-				anchor.getParent('ul').getChildren().removeClass('active');
-				anchor.getParent().addClass('active');
+				list.sort(key).update();
+				sortButtons.removeClass('active');
+				li.addClass('active');
 			});
 			
 			if(list.currentSorter == key)
 				li.addClass('active');
+			
+			sortButtons.push(li);
 		}, this);
 		
-		sortButtonElement.addEventListener('click', function(){
+		//create sorte direction button
+		sortDirectionButton.addEventListener('click', function(){
 			this.removeClass(list.sortOrder);
-			list.toggleSortOrder();
+			list.toggleSortOrder().update();
 			this.addClass(list.sortOrder);
 		});
 		
+		//create view buttons
+		if(list.views.length > 1){
+			listElement.appendChild(new Element('hr'));
+			$each(list.views, function(item){
+				var li = new Element('li').injectInside(listElement);
+				var anchor = new Element('a', {text: 'view as ' + item, href: '#'}).injectInside(li);
+				anchor.addEventListener('click', function(){
+					list.setView(item);
+					viewButtons.removeClass('active');
+					li.addClass('active');
+				});
+				
+				if(list.currentView == item)
+					li.addClass('active');
+				
+				viewButtons.push(li);
+			}, this);
+		}
+			
 		return this;
 	}
 });
@@ -203,8 +218,8 @@ function filterPosts(filterTags){
 		tags.push({name: key, count: item});
 	});
 	
-	postList.setData(posts);
-	tagList.setData(tags);
+	postList.setData(posts).update();
+	tagList.setData(tags).update();
 }
 
 /**/
@@ -244,73 +259,6 @@ function removeTag(tag){
 	$('search').set('value', '');
 	selectedTags.erase(tag);
 	updateBreadcrumbs();
-}
-
-/*List Helpers*/
-function createPostListItem(item){
-	var cache = postElementCache[item.hash];
-	if(cache){
-		cache.className = '';
-		return cache;
-	}
-
-	var postURL = item.url;
-	//var faviconURL = 'http://' + (postURL.split('/')[2] || '') + "/favicon.ico";
-	
-	var li = new Element('li');
-	var anchor = new Element('a', {
-		'text': item.title, 
-		'title': item.tags.join(', ') + '\n' + postURL,
-		'href': "javascript:chrome.tabs.create({url: '" + postURL + "'});"
-	});
-	var edit = new Element('span', {'class': 'edit', 'title': 'edit this bookmark'});
-	edit.addEventListener('click', bookmarkURL.pass([postURL, item.title]));
-	
-	if(item.notes){
-		anchor.appendChild(new Element('span', {'class': 'notes', 'text': item.notes}));
-	}
-	//var favicon = new Element("img", {src: faviconURL});
-	
-	li.appendChild(anchor);
-	li.appendChild(edit);
-	//anchor.appendChild(favicon);
-	
-	postElementCache[item.hash] = li;
-	
-	return li;
-}
-
-function createTagListItem(item){
-	var cache = tagElementCache[item.name];
-	if(cache){
-		cache.countElement.innerText = item.count;
-		cache.className = '';
-		return cache;
-	}
-
-	var tag = item.name;
-	var tagCount = item.count;
-	
-	var li = new Element('li');
-	var anchor = new Element('a', {'text': tag, 'href': '#'});
-	var count = new Element('span', {'class': 'count', 'text': tagCount});
-	li.countElement = count;
-	
-	if(!tag){
-		anchor.addClass('untagged').set('text', 'untagged');
-	}
-	
-	li.appendChild(anchor)
-	anchor.appendChild(count);
-	
-	anchor.addEventListener('click', function(){
-		selectTag(tag);
-		$('search').focus();
-	});
-	
-	tagElementCache[item.name] = li;
-	
-	return li;
 }
 
 /*Sorters*/
