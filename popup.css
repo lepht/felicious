@@ -193,6 +193,7 @@ ul.breadcrumbs li a:hover{
 /*__Lists__*/
 ul.tags,
 ul.posts{
+	position: relative;
 	height: 200px;
 	overflow-x: hidden;
 	overflow-y: scroll;
@@ -242,6 +243,13 @@ ul.posts li a img{
 	width: 16px;
 	margin-right: 5px;
 	float: left;
+}
+
+ul li.sizeindicator{
+	height: 1px !important;
+	width: 200px !important;
+	background-color: #000000 !important;
+	position: absolute !important;
 }
 
 /*__Post List__*/

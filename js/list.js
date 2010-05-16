@@ -9,6 +9,7 @@
 		this.sorters = options.sorters || {};
 		this.currentSorter = options.currentSorter || '';
 		this.currentFilter = '';
+		this.currentFilterRegExp = null;
 		this.views = [];
 		this.currentView = localStorage[this.localStorageID + 'View'] || 'list';
 		
@@ -25,20 +26,24 @@
 	
 	filter: function(q){
 		this.currentFilter = q;
-		var regExp = new RegExp(q, 'i');
+		var regExp = this.currentFilterRegExp = q ? new RegExp(q, 'i') : null;
 		var children = this.element.getChildren();
-		var el;
 		
 		for(var i = children.length - 1; i >= 0; i--){
-			el = children[i];
-			if(!q || el.get('text').match(regExp)){
-				el.removeClass('hidden');
-			}else{
-				el.addClass('hidden');
-			}
+			this.filterElement(children[i], regExp);
 		}
 		
 		return this;
+	},
+	
+	filterElement: function(el, regExp){
+		regExp = regExp || this.currentFilterRegExp;
+		
+		if(!regExp || el.get('text').match(regExp)){
+			el.removeClass('hidden');
+		}else{
+			el.addClass('hidden');
+		}
 	},
 	
 	sort: function(sorter){
@@ -74,22 +79,48 @@
 	},
 	
 	update: function(){
-		//this.element.empty();
-		this.element.getChildren().dispose();
+		clearInterval(this.updateIntervalID);
+		if(this.sizeIndicator)
+			this.sizeIndicator.dispose();
 		
-		for(var i = 0; i < this.data.length; i++){
-			this.element.appendChild(this.createElement(this.data[i]));
+		this.element.getChildren().dispose();
+		this.currentItemIndex = 0;
+		
+		while(this.element.scrollHeight <= this.element.offsetHeight + 20 && this.currentItemIndex < this.data.length){
+			this.updateBatch(22);
 		}
 		
-		if(this.currentFilter)
-			this.filter(this.currentFilter);
+		if(this.currentItemIndex < this.data.length){
+			this.updateIntervalID = setInterval(this.updateBatch.bind(this), 100);
+			this.sizeIndicator = this.sizeIndicator || new Element('li', {'class': 'sizeindicator'});
+			this.sizeIndicator.injectInside(this.element);
+			this.sizeIndicator.style.top = (this.data.length * 22) + 'px';
+		}
 		
 		return this;
+	},
+	
+	updateBatch: function(batchSize){
+		batchSize = batchSize || 100;
+		
+		var i = Math.min(this.currentItemIndex + batchSize, this.data.length);
+		while(this.currentItemIndex < i){
+			var el = this.createElement(this.data[this.currentItemIndex])
+			this.element.appendChild(el);
+			this.filterElement(el);
+			this.currentItemIndex ++;
+		}
+		
+		if(this.currentItemIndex >= this.data.length){
+			clearInterval(this.updateIntervalID);
+			this.sizeIndicator.dispose();
+		}
 	},
 	
 	setData: function(data){
 		this.data = data;
 		this.currentFilter = '';
+		this.currentFilterRegExp = null;
 		this.sort();
 		return this;
 	},
