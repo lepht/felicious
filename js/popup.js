@@ -69,6 +69,7 @@ document.addEvent('domready', function(){
 	
 	new SortMenu('post_sort', postList);
 	new SortMenu('tag_sort', tagList);
+	new KeyboardListNavigation('posts', {eventSource: 'search'});
 	
 	//Notifications
 	
@@ -187,6 +188,70 @@ var SortMenu = new Class({
 			
 		return this;
 	}
+});
+
+var KeyboardListNavigation = new Class({
+	initialize: function(el, options){
+		this.element = $(el);
+		this.currentElement = null;
+		this.eventSource = $(options.eventSource) || window;
+		var self = this;
+		
+		this.eventSource.addEventListener('keydown', function(event){
+			//up
+			if(event.keyCode == 38){ 
+				self.previous();
+				event.preventDefault();
+			//down
+			}else if(event.keyCode == 40){ 
+				self.next();
+				event.preventDefault();
+			//enter
+			}else if(event.keyCode == 13 && self.currentElement){ 
+				var e = document.createEvent('MouseEvents');
+				e.initEvent('click', true, true);
+				self.currentElement.getElement('a').dispatchEvent(e);
+				event.preventDefault();
+			//other
+			}else{
+				self.clear();
+			}
+		});
+		
+		this.eventSource.addEventListener('blur', function(){
+			self.clear();
+		});
+	},
+	
+	clear: function(){
+		if(this.currentElement)
+			this.currentElement.removeClass('selected');
+		
+		this.currentElement = null;
+	},
+	
+	setCurrentElement: function(el){
+		this.clear();
+		if(!el)
+			return;
+		
+		this.currentElement = el.addClass('selected');
+		
+		//ensure visibility of currently selected element
+		if(el.offsetTop < this.element.scrollTop){
+			this.element.scrollTop = el.offsetTop;
+		}else if(el.offsetTop + el.offsetHeight > this.element.scrollTop + this.element.offsetHeight){
+			this.element.scrollTop = el.offsetTop + el.offsetHeight - this.element.offsetHeight;
+		}
+	},
+	
+	next: function(){
+		this.setCurrentElement(this.currentElement ? this.currentElement.getNext('*:not(.hidden)') : this.element.getFirst('*:not(.hidden)'));
+	},
+	
+	previous: function(){
+		this.setCurrentElement(this.currentElement ? this.currentElement.getPrevious('*:not(.hidden)') : this.element.getLast('*:not(.hidden)'));
+	},
 });
 
 /**/

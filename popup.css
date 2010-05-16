@@ -233,7 +233,9 @@ ul.posts li a{
 }
 
 ul.tags li:hover a,
-ul.posts li:hover a{
+ul.posts li:hover a,
+ul.tags li.selected a,
+ul.posts li.selected a{
 	background-color: #eeeeee;
 }
 
