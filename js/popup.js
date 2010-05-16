@@ -40,14 +40,6 @@ document.addEvent('domready', function(){
 	});
 	$('search').focus();
 	
-	$('search').addEvent('change', function(){
-		if($('search').value){
-			$('cancelsearch').addClass('visible');
-		}else{
-			$('cancelsearch').removeClass('visible');
-		}
-	});
-	
 	$('tags_title').addEventListener('click', function(){
 		clearTags();
 		$('search').focus();
