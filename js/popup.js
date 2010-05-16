@@ -1,4 +1,5 @@
-﻿var selectedTags = [];
+﻿var version = '1.1.3';
+var selectedTags = [];
 var delicious = chrome.extension.getBackgroundPage().delicious;
 var notifications;
 var postList = null;
@@ -68,6 +69,14 @@ document.addEvent('domready', function(){
 	
 	new SortMenu('post_sort', postList);
 	new SortMenu('tag_sort', tagList);
+	
+	//Notifications
+	
+	//dont't show version update notification on install
+	if(localStorage['version'] && localStorage['version'] < version){
+		notifications.add('felicious has been updated (<a href="javascript:chrome.tabs.create({url: \'options.html\'});">changelog</a>)');
+	}
+	localStorage['version'] = version;
 	
 	chrome.extension.onRequest.addListener(function(request){
 		if(request == 'updated'){
