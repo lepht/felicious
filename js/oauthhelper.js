@@ -11,7 +11,7 @@
 		this.token = options.token;
 		this.tokenSecret = options.tokenSecret;
 		this.tokenLifetime = 3600000;
-		this.tokenTimestamp;
+		this.tokenTimestamp = 0;
 		this.verifier = undefined;
 		this.sessionHandle = options.sessionHandle;
 		
@@ -20,7 +20,7 @@
 		
 		if(this.isLoggedIn()){
 			this.refreshToken();
-			this.refreshTokenIntervalID = setInterval(this.refresh, 120000); //refresh every 2 minutes
+			this.refreshTokenIntervalID = setInterval(this.refresh.bind(this), 120000); //refresh every 2 minutes
 		}
 	},
 	
@@ -52,12 +52,12 @@
 	
 	//returns true if the access token nears its expiration time
 	isExpired: function(){
-		return this.tokenTimestamp + (this.tokenLifetime * .7) > new Date().getTime();
+		return this.tokenTimestamp + (this.tokenLifetime * .7) < new Date().getTime();
 	},
 	
 	//refresh access token if it expired
 	refresh: function(){
-		if(this.isLoggedIn() || this.isExpired())
+		if(this.isLoggedIn() && this.isExpired())
 			this.refreshToken();
 		
 		return this;
@@ -128,7 +128,7 @@
 				self.tokenTimestamp = new Date().getTime();
 				
 				self.fireEvent('loggedIn');
-				self.refreshTokenIntervalID = setInterval(self.refresh, 120000); //refresh every 2 minutes
+				self.refreshTokenIntervalID = setInterval(self.refresh.bind(self), 120000); //refresh every 2 minutes
 			},
 			
 			onFailure: function(){

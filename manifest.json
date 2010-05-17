@@ -1,6 +1,6 @@
 ﻿{
 	"name": "felicious",
-	"version": "0.2.0",
+	"version": "0.2.1",
 	"description": "Browse your f***ing delicious bookmarks",
 	"background_page": "background.html",
 	"options_page": "options.html",
