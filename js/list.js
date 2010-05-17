@@ -113,7 +113,8 @@
 		
 		if(this.currentItemIndex >= this.data.length){
 			clearInterval(this.updateIntervalID);
-			this.sizeIndicator.dispose();
+			if(this.sizeIndicator)
+				this.sizeIndicator.dispose();
 		}
 	},
 	
