@@ -1,6 +1,6 @@
 ﻿{
 	"name": "felicious",
-	"version": "0.1.3",
+	"version": "0.2.0",
 	"description": "Browse your f***ing delicious bookmarks",
 	"background_page": "background.html",
 	"options_page": "options.html",
@@ -14,6 +14,9 @@
 		"48": "images/icon_48.png"
 	},
 	"permissions": [
-		"https://api.del.icio.us/*", "tabs"
+		"http://api.del.icio.us/*", 
+		"https://api.del.icio.us/*", 
+		"https://api.login.yahoo.com/*", 
+		"tabs"
 	]
 }

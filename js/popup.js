@@ -1,4 +1,4 @@
-﻿var version = '1.1.3';
+﻿var version = '1.2.0';
 var selectedTags = [];
 var delicious = chrome.extension.getBackgroundPage().delicious;
 var notifications;
@@ -80,16 +80,16 @@ document.addEvent('domready', function(){
 	localStorage['version'] = version;
 	
 	chrome.extension.onRequest.addListener(function(request){
-		if(request == 'updated'){
+		if(request.type == 'updated'){
 			notifications.add('Your bookmarks have been updated');
-		}else if(request == 'error'){
+		}else if(request.type == 'error'){
 			//notifications.add('Bookmark update failed', 'error');
-		}else if(request == 'noupdate'){
+		}else if(request.type == 'noupdate'){
 			//notifications.add('Bookmarks still fresh');
 		}
 	});
 	
-	if(!delicious.username && !delicious.password){
+	if(!delicious.isLoggedIn()){
 		notifications.add('Set your user data in the <a href="javascript:chrome.tabs.create({url: \'options.html\'});">options page</a>');
 	}else{
 		delicious.update();

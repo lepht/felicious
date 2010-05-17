@@ -11,17 +11,40 @@
 		<h2>Options</h2>
 		
 		<form>
-			<div id="user">
-				<h3>User Data</h3>
+			<div class="fieldset" id="user">
+				<h3>Login with your...</h3>
 				
-				<label>Username</label>
-				<input type="text" name="username" id="username">
+				<h4>
+					<input type="radio" name="account_type" id="delicious"/><label for="delicious">Delicious Account</label>
+				</h4>
 				
-				<label>Password</label>
-				<input type="password" name="password" id="password">
+				<div id="delicious_form">
+					<label>Username</label>
+					<input type="text" name="username" id="username">
+					
+					<label>Password</label>
+					<input type="password" name="password" id="password">
+				</div>
+				
+				<span class="splitter">
+					<span>OR</span>
+				</span>
+				
+				<h4>
+					<input type="radio" name="account_type" id="yahoo" /><label for="yahoo">Yahoo! ID</label>
+				</h4>
+				<div id="yahoo_form">
+					<div class="logged_out">
+						<a href="#" id="yahoo_login">Click here to login</a>
+					</div>
+					<div class="logged_in">
+						Logged in <img src="images/checkmark.png" /><br />
+						<a href="#" id="yahoo_logout">Click here to logout</a>
+					</div>
+				</div>
 			</div>
 			
-			<div id="synch">
+			<div class="fieldset" id="synch">
 				<h3>Synching</h3>
 				<div class="row">
 					<input type="checkbox" name="autosynch" id="autosynch" /> <label for="autosynch">Enable Automatic Synching</label>
@@ -29,7 +52,7 @@
 				<div class="row">
 					<a href="#" id="synchnow">Synch Bookmarks Now</a>
 					<p id="syncherror">
-						An error occured while synching
+						An error occurred while synching
 					</p>
 				</div>
 			</div>
@@ -53,10 +76,14 @@
 			<h3>Credits</h3>
 			<p>
 				felicious is powered by the <a href="http://www.mootools.net">mootools</a> javascript framework.<br />
-				Bookmark &amp; Edit Icons by <a href="http://www.gentleface.com">gentleface</a>.
+				Bookmark, edit and checkmark icons by <a href="http://www.gentleface.com">gentleface</a>.
 			</p>
 			
 			<h3>Changelog</h3>
+			<h4>0.2.0</h4>
+			<p>
+				Added experimental support for Yahoo! ID accounts.
+			</p>
 			<h4>0.1.3</h4>
 			<p>
 				Improved startup time of the popup menu and added a tag cloud view.

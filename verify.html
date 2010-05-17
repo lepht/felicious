@@ -1,0 +1,16 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="de" lang="de">
+	<head>
+		<title>Title</title>
+		<script type="text/javascript" src="js/mootools-1.2.4.js"></script>
+		<script type="text/javascript" src="js/mootools-1.2.4.4-more.js"></script>
+		<script>
+			var params = window.location.href.split('?')[1].parseQueryString();
+			chrome.extension.sendRequest({'type': 'verify', 'data': params.oauth_verifier});
+			window.open('', '_self', ''); //bug fix
+			window.close();
+		</script>
+	</head>
+	<body>
+	</body>
+</html>

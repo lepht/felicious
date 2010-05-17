@@ -2,9 +2,8 @@
 	
 	//Implements: Events,
 	
-	initialize: function(username, password, autosynch){
-		this.username = username;
-		this.password = password;
+	initialize: function(user, autosynch){
+		this.user = user;
 		this.autosynch = Boolean(parseInt(localStorage.autosynch) || 0);
 		this.lastUpdate = null;
 		
@@ -15,6 +14,14 @@
 		this.tags = [];
 		
 		this.updateIn(this.autoUpdateInterval);
+	},
+	
+	isLoggedIn: function(){
+			return this.user.isLoggedIn();
+	},
+	
+	getURL: function(url, parameters){
+		return this.user.getURL(url, parameters);
 	},
 	
 	onComplete: function(){
@@ -46,11 +53,11 @@
 		console.log('update');
 		this.cancel();
 		this.isWorking = true;
-		var baseURL = 'https://' + this.username + ':' + this.password + '@api.del.icio.us/v1/';
 		var self = this;
 		
 		this.currentRequest = new Request({
 			method: 'get',
+			url: this.getURL('posts/update'),
 			onSuccess: function(responseText, responseXML){
 				var time = responseXML.getElementsByTagName('update')[0].getAttribute('time');
 				if(time > (localStorage['lastUpdate'] || '')){
@@ -58,17 +65,17 @@
 				}else{
 					console.log('no update');
 					//self.fireEvent('noupdate');
-					chrome.extension.sendRequest('noupdate');
+					chrome.extension.sendRequest({'type': 'noupdate'});
 					self.onComplete();
 				}
 			},
 			onFailure: function(){
 				console.log('posts/update failed');
 				//self.fireEvent('error');
-				chrome.extension.sendRequest('error');
+				chrome.extension.sendRequest({'type': 'error'});
 				self.onComplete();
 			}
-		}).send({'url': baseURL + 'posts/update'});
+		}).send();
 		
 		return this;
 	},
@@ -78,14 +85,12 @@
 		
 		console.log('load');
 		this.isWorking = true;
-		var baseURL = 'https://' + this.username + ':' + this.password + '@api.del.icio.us/v1/';
 		var self = this;
 		
 		this.currentRequest = new Request({
 			method: 'get', 
+			url: this.getURL('posts/all'),
 			onSuccess: function(responseText, responseXML){
-				console.log('success');
-				
 				var postsXML = responseXML.getElementsByTagName('post');
 				var a = [];
 				var tagIndex = {};
@@ -121,16 +126,16 @@
 				self.posts = a;
 				self.onComplete();
 				//self.fireEvent('update');
-				chrome.extension.sendRequest('updated');
+				chrome.extension.sendRequest({'type': 'updated'});
 			},
 			
 			onFailure: function(xhr){
 				console.log('posts/all failed');
 				//self.fireEvent('error');
-				chrome.extension.sendRequest('error');
+				chrome.extension.sendRequest({'type': 'error'});
 				self.onComplete();
 			}
-		}).send({url: baseURL + 'posts/all'});
+		}).send();
 		
 		return this;
 	}
@@ -140,35 +145,117 @@ function formatDate(d){
 	var pad = function(s){
 		return ('' + s).length < 2 ? '0' + s : '' + s;
 	}
-	
 	return d.getUTCFullYear() + '-' + pad(d.getUTCMonth() + 1) + '-' + pad(d.getUTCDate()) + 'T' + pad(d.getUTCHours()) + ':' + pad(d.getUTCMinutes()) + ':' + pad(d.getUTCSeconds()) + 'Z';
 }
 
+var DeliciousUser = new Class({
+	initialize: function(username, password){
+		this.type = 'delicious';
+		this.username = username;
+		this.password = password;
+	},
+	
+	getURL: function(url, parameters){
+		return 'https://' + this.username + ':' + this.password + '@api.del.icio.us/v1/' + url;
+	},
+	
+	isLoggedIn: function(){
+		return this.username && this.password;
+	},
+	
+	compare: function(user){
+		return this.type == user.type && this.username == user.username && this.password == user.password;
+	}
+});
+
+var YahooUser = new Class({
+	initialize: function(oauthHelper){
+		this.type = 'yahoo';
+		this.oauthHelper = oauthHelper;
+		this.sessionHandle = this.oauthHelper.sessionHandle;
+	},
+	
+	getURL: function(url, parameters){
+		return oauthHelper.sign('http://api.del.icio.us/v2/' + url, parameters);
+	},
+	
+	isLoggedIn: function(){
+		return this.oauthHelper.isLoggedIn();
+	},
+	
+	compare: function(user){
+		return this.type == user.type && this.sessionHandle == user.sessionHandle;
+	}
+});
+
+function getUser(){
+	if(localStorage.loginMethod == 'yahoo'){
+		return new YahooUser(oauthHelper);
+	}else{
+		return new DeliciousUser(localStorage.username, localStorage.password);
+	}
+}
+
 var delicious;
+var oauthHelper;
 
 document.addEvent('domready', function(){
-	delicious = new Delicious(localStorage.username, localStorage.password, localStorage.autosynch);
+	oauthHelper = new OAuthHelper({
+		'consumerKey': 'dj0yJmk9NVB5Z2phM0tVUDIwJmQ9WVdrOVRVOUZOV0o0TkhNbWNHbzlNVEU1TXpFME1qTTBOUS0tJnM9Y29uc3VtZXJzZWNyZXQmeD0yMg--',
+		'consumerSecret': '02df00ce19c9792d7b216e7198adf1437d2da499',
+		'token': localStorage.oauthToken, 
+		'tokenSecret': localStorage.oauthTokenSecret, 
+		'sessionHandle': localStorage.oauthSessionHandle,
+		'urls': {
+			'requestToken': 'https://api.login.yahoo.com/oauth/v2/get_request_token',
+			'getToken': 'https://api.login.yahoo.com/oauth/v2/get_token',
+			'callback': chrome.extension.getURL('verify.html')
+		}
+	});
+	oauthHelper.addEvent('loggedIn', function(){
+		localStorage.oauthToken = oauthHelper.token;
+		localStorage.oauthTokenSecret = oauthHelper.tokenSecret;
+		localStorage.oauthSessionHandle = oauthHelper.sessionHandle;
+		chrome.extension.sendRequest({'type': 'oauthLoginStateChanged'});
+	});
+	oauthHelper.addEvent('loggedOut', function(){
+		localStorage.removeItem('oauthToken');
+		localStorage.removeItem('oauthTokenSecret');
+		localStorage.removeItem('oauthSessionHandle');
+		chrome.extension.sendRequest({'type': 'oauthLoginStateChanged'});
+	});
 	
+	delicious = new Delicious(getUser(), localStorage.autosynch);
 	delicious.posts = JSON.decode(localStorage.posts) || [];
 	delicious.tags = JSON.decode(localStorage.tags) || [];
-	
 	delicious.update();
 	
 	chrome.extension.onRequest.addListener(function(request){
-		if(request == 'update'){
+		if(request.type == 'update'){
 			delicious.update();
-		}else if(request == 'reload'){
+		
+		}else if(request.type == 'reload'){
 			delicious.load();
-		}else if(request == 'updateoptions'){
+		
+		}else if(request.type == 'updateoptions'){
 			delicious.cancel();
-			if(delicious.username != localStorage.username){
-				delicious.username = localStorage.username;
-				localStorage.lastUpdate = '';
+			
+			if(localStorage.loginMethod != 'yahoo')
+				oauthHelper.logout();
+			
+			var user = getUser();
+			if(!user.compare(delicious.user)){
+				delicious.user = user;
+				localStorage.lastUpdate = ''; //reset last update time if user changed
 			}
-			delicious.password = localStorage.password;
+			
 			delicious.autosynch = Boolean(parseInt(localStorage.autosynch) || 0);
 			delicious.updateIn(10000); //Update Bookmarks 10 seconds after options changed
 			console.log('options updated');
+		
+		}else if(request.type == 'verify'){
+			console.log('verify', request.data);
+			oauthHelper.verify(request.data);
 		}
 	});
 });

@@ -25,50 +25,79 @@ h2{
 	font-size: 13px;
 	font-weight: bold;
 }
- 
-#user label{
-	display: block;
-}
 
 h3{
 	margin-top: 0;
+	font-size: 15px;
 }
 h4{
-	font-size: 12px;
-	font-weight: bold;
-	display: inline;
-	float: left;
-	margin: 0;
-	padding: 0 20px 0 0;
+	margin-top: 0;
+	font-size: 13px;
 }
+h4 > label{
+	display: inline !important;
+}
+
+/*__Form__*/
 input[type=text],
 input[type=password]{
 	width: 100%;
-}
-#user,
-#synch{
-	width: 220px;
-	margin: 0 20px 20px 0;
-	height: 120px;
-	float: left;
-	border: 1px solid #cccccc;
-	border-radius: 5px;
-	padding: 12px;
-}
-
-.row{
-	height: 20px;
-	line-height: 20px;
-	vertical-align: center;
 }
 input[type=checkbox]{
 	display: block;
 	float: left;
 }
-legend{
+
+.fieldset{
+	width: 220px;
+	margin: 0 20px 20px 0;
+	height: 280px;
+	float: left;
+	border: 1px solid #cccccc;
+	border-radius: 5px;
+	padding: 12px;
+}
+.fieldset label{
+	display: block;
+}
+.row{
+	height: 20px;
+	line-height: 20px;
+	vertical-align: center;
+}
+.disabled{
+	opacity: .1;
+}
+.disabled a{
+	cursor: normal;
+}
+
+span.splitter{
+	display: block;
+	text-align: center;
+	border-top: 1px solid #cccccc;
+	line-height: 16px;
+	margin: 20px 0 10px 0;
+}
+span.splitter span{
+	display: inline-block;
+	padding: 0 5px;
+	margin-top: -8px;
+	background-color: #ffffff;
 	font-weight: bold;
 }
 
+/*__Yahoo Form__*/
+#yahoo_form .logged_in,
+#yahoo_form.logged_in .logged_out{
+	display: none;
+}
+#yahoo_form .logged_out,
+#yahoo_form.logged_in .logged_in{
+	display: block;
+}
+
+/*__Synch Button__*/
 a.working{
 	background: url('images/spinner.gif') no-repeat right center;
 	padding-right: 20px;
@@ -76,6 +105,7 @@ a.working{
 	text-decoration: none;
 	cursor: default;
 }
+
 #syncherror{
 	-webkit-transition: opacity .5s ease-in-out, height 0s linear .5s;
 	opacity: 0;
@@ -91,9 +121,18 @@ a.error + #syncherror{
 	opacity: 1;
 }
 
+/*__Notes__*/
 div.notes{
 	float: right;
 	width: 320px;
 	padding: 6px 20px 0 20px;
 	border-left: 1px solid #cccccc;
+}
+.notes h4{
+	font-size: 12px;
+	font-weight: bold;
+	display: inline;
+	float: left;
+	margin: 0;
+	padding: 0 20px 0 0;
 }
