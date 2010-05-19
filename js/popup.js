@@ -69,7 +69,25 @@ document.addEvent('domready', function(){
 	
 	new SortMenu('post_sort', postList);
 	new SortMenu('tag_sort', tagList);
-	new KeyboardListNavigation('posts', {eventSource: 'search'});
+	var keyboardNavigation = new KeyboardListNavigation('posts', {eventSource: 'search'});
+	
+	$('search').addEventListener('keydown', function(event){
+		console.log(event.keyCode == 13);
+		if(event.keyCode == 13 && !keyboardNavigation.currentElement){
+			keyboardNavigation.setElement('tags').first();
+			event.preventDefault();
+		}else if(event.keyCode == 27 && keyboardNavigation.currentElement){ //escape
+			keyboardNavigation.clear();
+			keyboardNavigation.setElement('posts');
+			event.preventDefault();
+		}else if(event.keyCode == 27 && selectedTags.length){
+			removeTag(selectedTags[selectedTags.length - 1]);
+			event.preventDefault();
+		}else if(event.keyCode != 38 && event.keyCode != 40){
+			keyboardNavigation.setElement('posts');
+			keyboardNavigation.clear();
+		}
+	});
 	
 	//Notifications
 	
@@ -212,15 +230,20 @@ var KeyboardListNavigation = new Class({
 				e.initEvent('click', true, true);
 				self.currentElement.getElement('a').dispatchEvent(e);
 				event.preventDefault();
-			//other
-			}else{
-				self.clear();
 			}
 		});
 		
 		this.eventSource.addEventListener('blur', function(){
 			self.clear();
 		});
+	},
+	
+	setElement: function(el){
+		if(this.element != $(el)){
+			this.element = $(el);
+			this.currentElement = null;
+		}
+		return this;
 	},
 	
 	clear: function(){
@@ -246,12 +269,22 @@ var KeyboardListNavigation = new Class({
 	},
 	
 	next: function(){
-		this.setCurrentElement(this.currentElement ? this.currentElement.getNext('*:not(.hidden)') : this.element.getFirst('*:not(.hidden)'));
+		var el = this.currentElement ? this.currentElement.getNext('*:not(.hidden)') : null;
+		el ? this.setCurrentElement(el) : this.first();
 	},
 	
 	previous: function(){
-		this.setCurrentElement(this.currentElement ? this.currentElement.getPrevious('*:not(.hidden)') : this.element.getLast('*:not(.hidden)'));
+		var el = this.currentElement ? this.currentElement.getPrevious('*:not(.hidden)') : null;
+		el ? this.setCurrentElement(el) : this.last();
 	},
+	
+	first: function(){
+		this.setCurrentElement(this.element.getFirst('*:not(.hidden)'));
+	},
+	
+	last: function(){
+		this.setCurrentElement(this.element.getLast('*:not(.hidden)'));
+	}
 });
 
 /**/
