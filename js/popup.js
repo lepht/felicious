@@ -6,9 +6,12 @@ var postList = null;
 var tagList = null;
 var postElementCache = {};
 var tagElementCache = {};
+var isPopup = false;
 
 document.addEvent('domready', function(){
 	//initialize
+	isPopup = window.location.hash.contains('popup');
+	
 	postList = new PostList('posts', {
 		localStorageID: 'posts',
 		sortOrder: 'desc',
@@ -83,11 +86,15 @@ document.addEvent('domready', function(){
 		}else if(event.keyCode == 27 && selectedTags.length){
 			removeTag(selectedTags[selectedTags.length - 1]);
 			event.preventDefault();
+		}else if(event.keyCode == 27){
+			close();
 		}else if(event.keyCode != 38 && event.keyCode != 40){
 			keyboardNavigation.setElement('posts');
 			keyboardNavigation.clear();
 		}
 	});
+	
+	window.addEventListener('blur', close);
 	
 	//Notifications
 	
@@ -114,14 +121,22 @@ document.addEvent('domready', function(){
 	}
 });
 
-function bookmarkURL(url, title){
-	if(title){
-		var f = 'http://delicious.com/save?url=' + encodeURIComponent(url) + '&title=' + encodeURIComponent(title);
-	}else{
-		var f = 'http://delicious.com/save?url=' + encodeURIComponent(url);
+/*closes the window if it was opened with #popup*/
+function close(){
+	if(isPopup){
+		chrome.windows.getCurrent(function(win){	
+			chrome.windows.remove(win.id);
+		});
 	}
-	
-	window.open(f + '&v=5&noui=1&jump=doclose', 'deliciousuiv5', 'location=yes,links=no,scrollbars=no,toolbar=no,width=550,height=550');
+}
+
+function bookmarkURL(url, title){
+	chrome.extension.sendRequest({
+		'type': 'bookmark', 
+		'url': url,
+		'title': title
+	});
+	close();
 }
 
 /*returns true if array contains every item in items*/

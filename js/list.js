@@ -162,7 +162,7 @@ var PostList = new Class({
 		var anchor = new Element('a', {
 			'text': item.title, 
 			'title': item.tags.join(', ') + '\n' + postURL,
-			'href': "javascript:chrome.tabs.create({url: '" + postURL + "'});"
+			'href': "javascript:chrome.tabs.create({url: '" + postURL + "'});close();"
 		});
 		var edit = new Element('span', {'class': 'edit', 'title': 'edit this bookmark'});
 		edit.addEventListener('click', bookmarkURL.pass([postURL, item.title]));

@@ -48,6 +48,8 @@ input[type=checkbox]{
 	float: left;
 }
 
+
+/*__*/
 .fieldset{
 	width: 220px;
 	margin: 0 20px 20px 0;
@@ -60,10 +62,17 @@ input[type=checkbox]{
 .fieldset label{
 	display: block;
 }
+.fieldset hr{
+	margin: 20px -12px 20px -12px;
+	border: 0;
+	height: 1px;
+	background-color: #cccccc;
+}
 .row{
-	height: 20px;
+	min-height: 20px;
 	line-height: 20px;
 	vertical-align: center;
+	overflow: hidden;
 }
 .disabled{
 	opacity: .1;
@@ -119,6 +128,12 @@ a.error + #syncherror{
 	-webkit-transition: opacity .5s ease-in-out, height 0s;
 	height: 20px;
 	opacity: 1;
+}
+
+/*__Shortcuts__*/
+input.shortcut{
+	float: right;
+	margin: 0;
 }
 
 /*__Notes__*/

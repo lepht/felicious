@@ -13,6 +13,18 @@
 		"32": "images/icon_32.png",
 		"48": "images/icon_48.png"
 	},
+	"content_scripts": [
+		{
+			"matches": ["http://*/*", "https://*/*", "file://*/*"],
+			"js": ["js/shortcuts.js"],
+			"run_at": "document_start"
+		},
+		{
+			"matches": ["http://delicious.com/save*", "https://delicious.com/save*"],
+			"js": ["js/close.js"],
+			"run_at": "document_start"
+		}
+	],
 	"permissions": [
 		"http://api.del.icio.us/*", 
 		"https://api.del.icio.us/*", 

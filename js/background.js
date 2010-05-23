@@ -196,8 +196,42 @@ function getUser(){
 	}
 }
 
+function bookmarkURL(url, title){
+	if(title){
+		var f = 'http://delicious.com/save?url=' + encodeURIComponent(url) + '&title=' + encodeURIComponent(title);
+	}else{
+		var f = 'http://delicious.com/save?url=' + encodeURIComponent(url);
+	}
+	f += '&v=5&noui=1&jump=doclose';
+	
+	chrome.windows.create({'url': f, width: 550, height: 550, 'type': 'popup'});
+}
+function compare(obj1, obj2){
+	var keys = {};
+	var i;
+	
+	for(i in obj1)
+		keys[i] = undefined;
+	for(i in obj2)
+		keys[i] = undefined;
+	
+	for(i in keys){
+		if(obj1[i] != obj2[i])
+			return false;
+	}
+	return true;
+}
+function openPopup(){
+	chrome.windows.getCurrent(function(win){
+		console.log(win.top, win.right, win.type);
+		chrome.windows.create({'url': chrome.extension.getURL('popup.html#popup'), top: win.top + 50, left: win.left + win.width - 350, width: 320, height: 550, 'type': 'popup'});
+	});
+}
+
 var delicious;
 var oauthHelper;
+var shortcutPopup = localStorage['shortcutPopup'] ? JSON.parse(localStorage['shortcutPopup']) : {};
+var shortcutBookmark = localStorage['shortcutBookmark'] ? JSON.parse(localStorage['shortcutBookmark']) : {};
 
 document.addEvent('domready', function(){
 	oauthHelper = new OAuthHelper({
@@ -230,7 +264,9 @@ document.addEvent('domready', function(){
 	delicious.tags = JSON.decode(localStorage.tags) || [];
 	delicious.update();
 	
-	chrome.extension.onRequest.addListener(function(request){
+	chrome.extension.onRequest.addListener(function(request, sender, sendResponse){
+		console.log('request', request);
+		
 		if(request.type == 'update'){
 			delicious.update();
 		
@@ -249,6 +285,9 @@ document.addEvent('domready', function(){
 				localStorage.lastUpdate = ''; //reset last update time if user changed
 			}
 			
+			shortcutPopup = localStorage.shortcutPopup ? JSON.parse(localStorage.shortcutPopup) : {};
+			shortcutBookmark = localStorage.shortcutBookmark ? JSON.parse(localStorage.shortcutBookmark) : {};
+			
 			delicious.autosynch = Boolean(parseInt(localStorage.autosynch) || 0);
 			delicious.updateIn(10000); //Update Bookmarks 10 seconds after options changed
 			console.log('options updated');
@@ -256,6 +295,16 @@ document.addEvent('domready', function(){
 		}else if(request.type == 'verify'){
 			console.log('verify', request.data);
 			oauthHelper.verify(request.data);
+		}else if(request.type == 'bookmark'){
+			bookmarkURL(request.url, request.title);
+		}else if(request.type == 'popup'){
+			openPopup();
+		}else if(request.type == 'shortcut'){
+			if(compare(shortcutPopup, request.keyCombination)){
+				openPopup();
+			}else if(compare(shortcutBookmark, request.keyCombination)){
+				bookmarkURL(request.page.url, request.page.title);
+			}
 		}
 	});
 });
