@@ -196,15 +196,25 @@ function getUser(){
 	}
 }
 
-function bookmarkURL(url, title){
+function bookmarkURL(url, title, options){
+	var url;
 	if(title){
-		var f = 'http://delicious.com/save?url=' + encodeURIComponent(url) + '&title=' + encodeURIComponent(title);
+		url = 'http://delicious.com/save?url=' + encodeURIComponent(url) + '&title=' + encodeURIComponent(title);
 	}else{
-		var f = 'http://delicious.com/save?url=' + encodeURIComponent(url);
+		url = 'http://delicious.com/save?url=' + encodeURIComponent(url);
 	}
-	f += '&v=5&noui=1&jump=doclose';
+	url += '&v=5&noui=1&jump=doclose';
 	
-	chrome.windows.create({'url': f, width: 550, height: 550, 'type': 'popup'});
+	console.log(options);
+	options = options || {};
+	options.url = url;
+	options.type = 'popup';
+	options.left = options.left || undefined;
+	options.top = options.top || undefined;
+	options.width = options.width || 550;
+	options.height = options.height || 550;
+	
+	chrome.windows.create(options);
 }
 function compare(obj1, obj2){
 	var keys = {};
@@ -221,10 +231,18 @@ function compare(obj1, obj2){
 	}
 	return true;
 }
-function openPopup(){
+function openPopup(options){
 	chrome.windows.getCurrent(function(win){
-		console.log(win.top, win.right, win.type);
-		chrome.windows.create({'url': chrome.extension.getURL('popup.html#popup'), top: win.top + 50, left: win.left + win.width - 350, width: 320, height: 550, 'type': 'popup'});
+		options = options || {};
+		options.url = chrome.extension.getURL('popup.html#popup');
+		options.type = 'popup';
+		
+		options.left = options.left ||  win.left + win.width - 350;
+		options.top = options.top || win.top + 50;
+		options.width = options.width || 320;
+		options.height = options.height || 550;
+		
+		chrome.windows.create(options);
 	});
 }
 
@@ -265,8 +283,6 @@ document.addEvent('domready', function(){
 	delicious.update();
 	
 	chrome.extension.onRequest.addListener(function(request, sender, sendResponse){
-		console.log('request', request);
-		
 		if(request.type == 'update'){
 			delicious.update();
 		
@@ -295,15 +311,28 @@ document.addEvent('domready', function(){
 		}else if(request.type == 'verify'){
 			console.log('verify', request.data);
 			oauthHelper.verify(request.data);
+			
 		}else if(request.type == 'bookmark'){
 			bookmarkURL(request.url, request.title);
+			
 		}else if(request.type == 'popup'){
 			openPopup();
+			
 		}else if(request.type == 'shortcut'){
 			if(compare(shortcutPopup, request.keyCombination)){
-				openPopup();
+				openPopup({
+					'left': Math.min(window.screen.width - 320, Math.max(0, request.window.x + request.window.width - 370)), 
+					'top': request.window.y + 50, 
+					'width': 320, 
+					'height': 550
+				});
 			}else if(compare(shortcutBookmark, request.keyCombination)){
-				bookmarkURL(request.page.url, request.page.title);
+				bookmarkURL(request.page.url, request.page.title, {
+					'left': Math.round(Math.max(0, Math.min(window.screen.width - 550, request.window.x + request.window.width * .5 - 225))),
+					'top': Math.round(Math.max(0, Math.min(window.screen.height - 550, request.window.y + request.window.height * .5 - 255))),
+					'width': 550,
+					'height': 550
+				});
 			}
 		}
 	});
