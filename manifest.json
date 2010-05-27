@@ -16,7 +16,7 @@
 	"content_scripts": [
 		{
 			"matches": ["http://*/*", "https://*/*", "file://*/*"],
-			"js": ["js/shortcuts.js"],
+			"js": ["js/utils.js", "js/shortcuts.js"],
 			"run_at": "document_start"
 		},
 		{

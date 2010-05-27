@@ -216,21 +216,6 @@ function bookmarkURL(url, title, options){
 	
 	chrome.windows.create(options);
 }
-function compare(obj1, obj2){
-	var keys = {};
-	var i;
-	
-	for(i in obj1)
-		keys[i] = undefined;
-	for(i in obj2)
-		keys[i] = undefined;
-	
-	for(i in keys){
-		if(obj1[i] != obj2[i])
-			return false;
-	}
-	return true;
-}
 function openPopup(options){
 	chrome.windows.getCurrent(function(win){
 		options = options || {};
@@ -333,6 +318,13 @@ document.addEvent('domready', function(){
 					'width': 550,
 					'height': 550
 				});
+			}
+		
+		}else if(request.type == 'getShortcut'){
+			if(compare(shortcutPopup, request.keyCombination)){
+				sendResponse('popup');
+			}else if(compare(shortcutBookmark, request.keyCombination)){
+				sendResponse('bookmark');
 			}
 		}
 	});
