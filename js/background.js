@@ -246,7 +246,7 @@ document.addEvent('domready', function(){
 		'urls': {
 			'requestToken': 'https://api.login.yahoo.com/oauth/v2/get_request_token',
 			'getToken': 'https://api.login.yahoo.com/oauth/v2/get_token',
-			'callback': chrome.extension.getURL('verify.html')
+			'callback': 'oob'
 		}
 	});
 	oauthHelper.addEvent('loggedIn', function(){

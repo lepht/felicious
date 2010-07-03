@@ -23,6 +23,11 @@
 			"matches": ["http://delicious.com/save*", "https://delicious.com/save*"],
 			"js": ["js/close.js"],
 			"run_at": "document_start"
+		},
+		{
+			"matches": ["https://api.login.yahoo.com/oauth/v2/request_auth"],
+			"js": ["js/verify.js"],
+			"run_at": "document_start"
 		}
 	],
 	"permissions": [
