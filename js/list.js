@@ -162,8 +162,13 @@ var PostList = new Class({
 		var anchor = new Element('a', {
 			'text': item.title, 
 			'title': item.tags.join(', ') + '\n' + postURL,
-			'href': "javascript:chrome.tabs.create({url: '" + postURL + "'});close();"
+			'href': '#'
 		});
+		anchor.addEventListener('click', function(e){
+			chrome.tabs.create({url: postURL, selected: !(e.button == 1 || e.ctrlKey)});
+			e.preventDefault();
+		});
+		
 		var edit = new Element('span', {'class': 'edit', 'title': 'edit this bookmark'});
 		edit.addEventListener('click', bookmarkURL.pass([postURL, item.title]));
 		
