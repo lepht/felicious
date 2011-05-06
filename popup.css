@@ -163,7 +163,7 @@ ul.breadcrumbs{
 	background-image: url("images/breadcrumbs_splitter.png");
 	background-position: -12px center;
 	background-repeat: no-repeat;
-	padding-left: 16px;
+	padding-left: 0px;
 	width: 100%;
 }
 ul.breadcrumbs:empty{
